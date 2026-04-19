@@ -611,10 +611,10 @@ body {
 .reader__hero { aspect-ratio: 16 / 8; }
 
 .reader__body {
-  font-family: var(--sans);
+  font-family: var(--display);
   font-size: 16px;
-  font-weight: 300;
-  line-height: 1.5;
+  font-weight: 400;
+  line-height: 28px;
   letter-spacing: -0.08px;
   color: var(--ink);
   align-self: stretch;
