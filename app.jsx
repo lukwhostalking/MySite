@@ -357,6 +357,22 @@ function TweaksPanel({ tweaks, setTweaks, visible }) {
   );
 }
 
+// ───────── Medium RSS feed ─────────
+function parseMediumFeed(xml) {
+  const doc = new DOMParser().parseFromString(xml, "application/xml");
+  return [...doc.querySelectorAll("item")].map(item => {
+    const get = tag => item.getElementsByTagName(tag)[0]?.textContent?.trim() ?? "";
+    const link = get("link");
+    const slug = link.split("/").filter(Boolean).pop() || get("guid").split("/").pop();
+    const rawDate = get("pubDate");
+    const date = rawDate ? new Date(rawDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
+    const rawBody = get("content:encoded") || get("description");
+    const body = rawBody.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "")
+      + `<p style="margin-top:1.5em"><a href="${link}" target="_blank" rel="noopener">Read on Medium →</a></p>`;
+    return { id: `medium-${slug}`, date, kind: "text", title: get("title"), body, tags: ["medium"] };
+  }).filter(e => e.title && e.id);
+}
+
 // ───────── Substack RSS feed ─────────
 function parseSubstackFeed(xml) {
   const doc = new DOMParser().parseFromString(xml, "application/xml");
@@ -430,6 +446,22 @@ function App() {
         }
       })
       .catch(err => console.warn("Substack feed unavailable, using sample posts:", err));
+  }, []);
+
+  useEffect(() => {
+    const RSS = "https://medium.com/feed/@lukwhostalking";
+    fetch("https://corsproxy.io/?url=" + encodeURIComponent(RSS))
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(xml => {
+        const posts = parseMediumFeed(xml);
+        if (posts.length > 0) {
+          setEntries(prev => {
+            const merged = [...prev, ...posts.filter(p => !prev.find(e => e.id === p.id))];
+            return merged.sort((a, b) => b.date.localeCompare(a.date));
+          });
+        }
+      })
+      .catch(err => console.warn("Medium feed unavailable:", err));
   }, []);
 
   const openEntry = entries.find((e) => e.id === openId);
