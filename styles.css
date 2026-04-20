@@ -629,6 +629,8 @@ body {
   font-weight: 600;
   margin: 1.6em 0 0.4em;
 }
+.reader__body img { max-width: 100%; height: auto; display: block; border-radius: 6px; }
+.reader__body a { color: inherit; text-decoration: underline solid; text-decoration-skip-ink: none; }
 .reader__body em { font-style: italic; }
 .reader__body strong { font-weight: 600; }
 .reader__body ul, .reader__body ol {
@@ -821,32 +823,40 @@ body {
   }
   .reader--side-left .reader__panel,
   .reader--side-right .reader__panel {
-    margin: 88px 16px 24px;
+    margin: 16px;
     width: auto;
     max-width: none;
   }
   .reader__rail { display: none; }
-  .reader__inner { padding: 32px 24px; }
-  .reader__title { font-size: 22px; }
+  .reader__inner { padding: 48px 24px; gap: 16px; }
+  .reader__title { font-size: 32px; padding: 0; }
+  .reader__date { padding: 0; }
 
-  /* Mobile scroll: make the panel the scroll container instead of .reader.
+  /* Mobile scroll: center panel in viewport and make it the scroll container.
      iOS Safari can't reliably scroll a fixed-position ancestor (.reader) when
      body has overflow: hidden, so scrolling the panel directly is the fix. */
-  .reader { overflow: hidden; }
+  .reader {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .reader__panel {
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 112px);
-    max-height: calc(100dvh - 112px);
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
   .reader__close {
     position: sticky;
-    top: 12px;
+    top: 15px;
     align-self: flex-end;
-    margin: 12px 12px -42px 12px;
+    margin: 15px 17px -39px;
+    width: 24px;
+    height: 24px;
     z-index: 10;
   }
 }
