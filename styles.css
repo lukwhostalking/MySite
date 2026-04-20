@@ -493,7 +493,7 @@ body {
 
 /* Rail — connector + dot aligning the panel with the spine */
 .reader__rail {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -773,6 +773,7 @@ body {
 /* ───────── Desktop reader body ───────── */
 @media (min-width: 1101px) {
   .reader__body { font-size: 20px; line-height: 32px; }
+  .reader__inner { padding: 64px; }
 }
 
 /* ───────── Mobile (≤480px) ───────── */
