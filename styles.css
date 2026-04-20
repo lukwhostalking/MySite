@@ -631,6 +631,7 @@ body {
 }
 .reader__body img { max-width: 100%; height: auto; display: block; border-radius: 6px; }
 .reader__body a { color: inherit; text-decoration: underline solid; text-decoration-skip-ink: none; }
+.reader__body .image-link-expand { display: none; }
 .reader__body em { font-style: italic; }
 .reader__body strong { font-weight: 600; }
 .reader__body ul, .reader__body ol {
