@@ -770,6 +770,11 @@ body {
   .tweaks { left: 12px; right: 12px; width: auto; bottom: 12px; }
 }
 
+/* ───────── Desktop reader body ───────── */
+@media (min-width: 1101px) {
+  .reader__body { font-size: 20px; line-height: 32px; }
+}
+
 /* ───────── Mobile (≤480px) ───────── */
 @media (max-width: 480px) {
   .nav {
