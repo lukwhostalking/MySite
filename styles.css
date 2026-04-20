@@ -630,6 +630,8 @@ body {
   margin: 1.6em 0 0.4em;
 }
 .reader__body img { max-width: 100%; height: auto; display: block; border-radius: 6px; }
+.reader__body figure { margin: 16px 0; width: 100%; }
+.reader__body figure img { width: 100%; }
 .reader__body a { color: inherit; text-decoration: underline solid; text-decoration-skip-ink: none; }
 .reader__body .image-link-expand { display: none; }
 .reader__body em { font-style: italic; }
