@@ -557,7 +557,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
 }
 
 .reader__close {
@@ -588,6 +588,7 @@ body {
   text-align: center;
   text-wrap: balance;
   width: 100%;
+  padding: 0 32px;
 }
 
 .reader__date {
@@ -600,22 +601,23 @@ body {
   margin: 0;
   text-align: center;
   white-space: nowrap;
+  padding: 0 32px;
 }
 
 .reader__hero, .reader__image {
   align-self: stretch;
-  margin: 0 0 28px;
+  margin: 0;
   border-radius: 6px;
   overflow: hidden;
 }
-.reader__hero { aspect-ratio: 16 / 8; }
+.reader__hero { aspect-ratio: 3096 / 1624; }
 
 .reader__body {
   font-family: var(--display);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 28px;
-  letter-spacing: -0.08px;
+  line-height: 30px;
+  letter-spacing: -0.09px;
   color: var(--ink);
   align-self: stretch;
 }
@@ -770,10 +772,9 @@ body {
   .tweaks { left: 12px; right: 12px; width: auto; bottom: 12px; }
 }
 
-/* ───────── Desktop reader body ───────── */
+/* ───────── Desktop reader ───────── */
 @media (min-width: 1101px) {
-  .reader__body { font-size: 20px; line-height: 32px; }
-  .reader__inner { padding: 64px; }
+  .reader__inner { padding: 48px 64px; }
 }
 
 /* ───────── Mobile (≤480px) ───────── */
