@@ -360,6 +360,30 @@ function TweaksPanel({ tweaks, setTweaks, visible }) {
   );
 }
 
+// ───────── CORS proxy fetch with fallbacks ─────────
+// Safari's Advanced Privacy Protection (and some corporate DNS / ad blockers)
+// can block individual CORS proxies, which previously made the whole timeline
+// appear empty. Try each proxy in order until one succeeds.
+const CORS_PROXIES = [
+  url => "https://corsproxy.io/?url=" + encodeURIComponent(url),
+  url => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
+  url => "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(url),
+];
+
+async function fetchViaProxy(url) {
+  let lastErr;
+  for (const build of CORS_PROXIES) {
+    try {
+      const r = await fetch(build(url));
+      if (!r.ok) throw new Error(r.status);
+      return await r.text();
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr ?? new Error("All CORS proxies failed");
+}
+
 // ───────── Medium RSS feed ─────────
 function parseMediumFeed(xml) {
   const doc = new DOMParser().parseFromString(xml, "application/xml");
@@ -458,9 +482,7 @@ function App() {
   );
 
   useEffect(() => {
-    const RSS = "https://ishanbhalla.substack.com/feed";
-    fetch("https://corsproxy.io/?url=" + encodeURIComponent(RSS))
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    fetchViaProxy("https://ishanbhalla.substack.com/feed")
       .then(xml => {
         const posts = parseSubstackFeed(xml);
         if (posts.length > 0) {
@@ -470,13 +492,11 @@ function App() {
           });
         }
       })
-      .catch(err => console.warn("Substack feed unavailable, using sample posts:", err));
+      .catch(err => console.warn("Substack feed unavailable:", err));
   }, []);
 
   useEffect(() => {
-    const RSS = "https://medium.com/feed/@lukwhostalking";
-    fetch("https://corsproxy.io/?url=" + encodeURIComponent(RSS))
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    fetchViaProxy("https://medium.com/feed/@lukwhostalking")
       .then(xml => {
         const posts = parseMediumFeed(xml);
         if (posts.length > 0) {
