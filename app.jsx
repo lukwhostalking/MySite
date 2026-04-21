@@ -388,12 +388,29 @@ function parseSubstackFeed(xml) {
   }).filter(e => e.title && e.id);
 }
 
+// ───────── URL <-> openId sync ─────────
+function idFromHash() {
+  const m = (window.location.hash || "").match(/^#post\/(.+)$/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+function writeHashForId(id) {
+  const target = id ? `#post/${encodeURIComponent(id)}` : "";
+  if (id) {
+    if (window.location.hash !== target) {
+      window.history.pushState(null, "", target);
+    }
+  } else if (window.location.hash.startsWith("#post/")) {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+}
+
 // ───────── App ─────────
 function App() {
   const [tweaks, setTweaks] = useState(TWEAKS);
   const [tweaksVisible, setTweaksVisible] = useState(false);
-  const [openId, setOpenId] = useState(null);
-  const [siteModifier, setSiteModifier] = useState(null);
+  const [openId, setOpenId] = useState(() => idFromHash());
+  const [siteModifier, setSiteModifier] = useState(() => (idFromHash() ? "opening" : null));
 
   // Tweaks toggle via postMessage (design tool integration)
   useEffect(() => {
@@ -470,19 +487,36 @@ function App() {
 
   const handleOpen = (id) => {
     setSiteModifier("opening"); // adds transition-delay to spine (step 2 fires after cards fade)
+    writeHashForId(id);
     setOpenId(id);
   };
 
   const handleClose = () => {
     setSiteModifier(null); // remove delay so spine returns immediately after panel fades
+    writeHashForId(null);
     setOpenId(null);
   };
 
+  // Sync state when the user navigates via back/forward or a hash link
+  useEffect(() => {
+    const sync = () => {
+      const id = idFromHash();
+      setOpenId(id);
+      setSiteModifier(id ? "opening" : null);
+    };
+    window.addEventListener("popstate", sync);
+    window.addEventListener("hashchange", sync);
+    return () => {
+      window.removeEventListener("popstate", sync);
+      window.removeEventListener("hashchange", sync);
+    };
+  }, []);
+
   const siteClass = [
     "site",
-    openId ? "site--reader-open" : "",
-    openId ? `site--reader-${openSide}` : "",
-    siteModifier ? `site--${siteModifier}` : "",
+    openEntry ? "site--reader-open" : "",
+    openEntry ? `site--reader-${openSide}` : "",
+    openEntry && siteModifier ? `site--${siteModifier}` : "",
   ].filter(Boolean).join(" ");
 
   return (
