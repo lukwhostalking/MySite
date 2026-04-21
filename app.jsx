@@ -184,10 +184,8 @@ function Card({ entry, side, onOpen, tweaks, hidden }) {
         )}
         {entry.kind === "text" && (
           <>
-            <div className="card__text">
-              <h3 className="card__title card__title--lg">{entry.title}</h3>
-              <div className="card__date">{formatDate(entry.date, tweaks.dateFormat)}</div>
-            </div>
+            <h3 className="card__title card__title--lg">{entry.title}</h3>
+            <div className="card__date">{formatDate(entry.date, tweaks.dateFormat)}</div>
             {entry.coverImage && (
               <img className="card__cover" src={entry.coverImage} alt="" />
             )}
@@ -391,7 +389,9 @@ function parseSubstackFeed(xml) {
     const body = rawBody.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "");
     const enclosure = item.querySelector("enclosure");
     const mediaEl = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("media:thumbnail")[0];
-    const coverImage = enclosure?.getAttribute("url") || mediaEl?.getAttribute("url") || null;
+    const rawCover = enclosure?.getAttribute("url") || mediaEl?.getAttribute("url") || null;
+    // w_256,c_limit is Substack's newsletter avatar/icon, not a post hero image
+    const coverImage = rawCover && !rawCover.includes("w_256,c_limit") ? rawCover : null;
     return { id: slug, date, kind: "text", title: get("title"), body, tags: [], coverImage };
   }).filter(e => e.title && e.id);
 }

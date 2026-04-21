@@ -273,14 +273,9 @@ body {
 
 /* Text card */
 .card--text {
+  padding: 24px;
   text-align: left;
   border: 1px solid var(--rule-soft);
-}
-.card--text .card__text {
-  padding: 24px;
-}
-.card--text:has(.card__cover) .card__text {
-  padding-bottom: 0;
 }
 .card__cover {
   display: block;
