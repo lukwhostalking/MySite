@@ -273,9 +273,21 @@ body {
 
 /* Text card */
 .card--text {
-  padding: 24px;
   text-align: left;
   border: 1px solid var(--rule-soft);
+}
+.card--text .card__text {
+  padding: 24px;
+}
+.card--text:has(.card__cover) .card__text {
+  padding-bottom: 0;
+}
+.card__cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3096 / 1624;
+  object-fit: cover;
+  margin-top: 32px;
 }
 .card--text .card__title--lg {
   font-family: var(--display);

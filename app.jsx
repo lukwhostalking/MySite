@@ -184,8 +184,13 @@ function Card({ entry, side, onOpen, tweaks, hidden }) {
         )}
         {entry.kind === "text" && (
           <>
-            <h3 className="card__title card__title--lg">{entry.title}</h3>
-            <div className="card__date">{formatDate(entry.date, tweaks.dateFormat)}</div>
+            <div className="card__text">
+              <h3 className="card__title card__title--lg">{entry.title}</h3>
+              <div className="card__date">{formatDate(entry.date, tweaks.dateFormat)}</div>
+            </div>
+            {entry.coverImage && (
+              <img className="card__cover" src={entry.coverImage} alt="" />
+            )}
           </>
         )}
         {entry.kind === "image" && (
@@ -384,7 +389,10 @@ function parseSubstackFeed(xml) {
     const date = rawDate ? new Date(rawDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
     const rawBody = get("content:encoded") || get("description");
     const body = rawBody.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "");
-    return { id: slug, date, kind: "text", title: get("title"), body, tags: [] };
+    const enclosure = item.querySelector("enclosure");
+    const mediaEl = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("media:thumbnail")[0];
+    const coverImage = enclosure?.getAttribute("url") || mediaEl?.getAttribute("url") || null;
+    return { id: slug, date, kind: "text", title: get("title"), body, tags: [], coverImage };
   }).filter(e => e.title && e.id);
 }
 
