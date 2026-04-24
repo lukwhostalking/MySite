@@ -285,7 +285,7 @@ function Timeline({ entries, onOpen, tweaks, openId }) {
   return (
     <div className="timeline">
       <div className="timeline__spine" aria-hidden="true" />
-      <div className="timeline__today">Today</div>
+      <div className="timeline__today" />
       <div className="timeline__list">
         {entries.map((e, i) => (
           <Card
