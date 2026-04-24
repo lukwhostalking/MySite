@@ -629,7 +629,7 @@ body {
   color: rgba(0,0,0,0.7);
   align-self: stretch;
 }
-.reader__body p { margin: 0 0 16px; text-wrap: pretty; }
+.reader__body p { margin: 0 0 28px; text-wrap: pretty; }
 .reader__body p:last-child { margin-bottom: 0; }
 .reader__body h3 {
   font-family: var(--serif);
