@@ -17,6 +17,7 @@
 
   --serif: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   --display: "Playfair Display", Georgia, serif;
+  --rounded: "SF Pro Rounded", system-ui, sans-serif;
   --sans:  "Inter Tight", -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono:  "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -285,12 +286,12 @@ body {
   margin-top: 32px;
 }
 .card--text .card__title--lg {
-  font-family: var(--display);
+  font-family: var(--rounded);
   font-size: 32px;
   line-height: 1.5;
   font-weight: 500;
   margin: 0 0 16px;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.16px;
   color: var(--ink);
   text-wrap: balance;
 }
@@ -315,11 +316,11 @@ body {
 }
 
 .card__date {
-  font-family: var(--sans);
+  font-family: "Inter", Arial, sans-serif;
   font-size: 14px;
   font-weight: 300;
   color: var(--ink-dim);
-  letter-spacing: -0.005em;
+  letter-spacing: -0.07px;
   text-align: left;
   white-space: nowrap;
 }
@@ -585,7 +586,7 @@ body {
 .reader__close:hover { background: var(--rule-soft); color: var(--ink); }
 
 .reader__title {
-  font-family: var(--display);
+  font-family: var(--rounded);
   font-size: 32px;
   line-height: 1.5;
   font-weight: 500;
@@ -599,7 +600,7 @@ body {
 }
 
 .reader__date {
-  font-family: var(--sans);
+  font-family: "Inter", Arial, sans-serif;
   font-size: 14px;
   font-weight: 300;
   color: var(--ink-dim);
@@ -620,10 +621,10 @@ body {
 .reader__hero { aspect-ratio: 3096 / 1624; }
 
 .reader__body {
-  font-family: var(--display);
+  font-family: Georgia, serif;
   font-size: 18px;
   font-weight: 400;
-  line-height: 30px;
+  line-height: 28px;
   letter-spacing: -0.09px;
   color: var(--ink);
   align-self: stretch;
@@ -779,8 +780,6 @@ body {
   /* Hide reader rail connector in narrow — too complex to reposition */
   .reader__rail { display: none; }
   .reader__inner { padding: 32px 28px; }
-  .reader__title { font-size: 24px; }
-  .reader__body { font-size: 16px; }
   .tweaks { left: 12px; right: 12px; width: auto; bottom: 12px; }
 }
 
