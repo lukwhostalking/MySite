@@ -244,8 +244,10 @@ function Reader({ entry, onClose, tweaks, side }) {
           </svg>
         </button>
         <div className="reader__inner">
-          <h1 className="reader__title">{entry.title}</h1>
-          <div className="reader__date">{formatDate(entry.date, tweaks.dateFormat)}</div>
+          <div className="reader__header">
+            <h1 className="reader__title">{entry.title}</h1>
+            <div className="reader__date">{formatDate(entry.date, tweaks.dateFormat)}</div>
+          </div>
           {entry.kind === "image" && entry.image && (
             <div className="reader__image"><ImageMock variant={entry.image.variant} /></div>
           )}
