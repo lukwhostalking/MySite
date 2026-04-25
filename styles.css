@@ -757,31 +757,49 @@ body {
 /* ───────── Responsive ───────── */
 @media (max-width: 1100px) {
   .nav { padding: 20px 24px; }
-  .timeline { max-width: 100%; }
-  .timeline__spine { left: clamp(24px, 28vw, 277px); }
-  .timeline__today { left: clamp(24px, 28vw, 277px); transform: none; }
+  .site__main { padding: 32px 0 160px; }
+  /* Timeline holds card + connector + 2×24px min padding. Above this width it
+     stays centered (margin auto grows both sides); below it fills the viewport
+     and cards start shrinking. */
+  .timeline { max-width: 522px; }
+  .timeline__spine { left: 24px; }
+  .timeline__today { left: 24px; transform: none; }
+  .timeline__end { justify-content: flex-start; padding-left: 21px; }
   .node { grid-template-columns: 1fr; }
   .node--left, .node--right { justify-items: stretch; }
   .node--left > .card, .node--right > .card {
     grid-column: 1;
-    margin: 0 0 0 calc(clamp(24px, 28vw, 277px) + 66px);
+    margin: 0 24px 0 90px;
     width: auto;
     max-width: 408px;
   }
-  .node__dot { left: clamp(24px, 28vw, 277px); }
+  .node__dot { left: 24px; }
   .node--left  .node__connector,
   .node--right .node__connector {
-    left: clamp(24px, 28vw, 277px); right: auto; width: 66px; min-width: 0;
+    left: 24px; right: auto; width: 66px; min-width: 0;
   }
-  /* Narrow expanded: spine stays left */
-  .site.site--reader-left .timeline__spine  { left: 68px; }
-  .site.site--reader-left .timeline__today  { left: 68px; transform: none; }
-  .site.site--reader-right .timeline__spine { left: 68px; }
-  .site.site--reader-right .timeline__today { left: 68px; transform: none; }
+  /* Narrow expanded: drop the timeline's centered max-width so the spine's
+     `left: 24px` is anchored to the viewport edge instead of the centered
+     timeline edge (which the reader panel would otherwise cover). Cards are
+     hidden via opacity when reader is open, so reflow is invisible. */
+  .site.site--reader-open .timeline {
+    max-width: none;
+  }
+  /* Spine and panel margins absorb width loss between 896px and 848px so the
+     panel stays at its 720px max in that range. Below 848px both clamp at
+     their minimums (spine 24px, panel margin-left 112px) and the panel
+     starts shrinking via its `width: auto` against the fixed margins. */
+  .site.site--reader-left .timeline__spine,
+  .site.site--reader-right .timeline__spine { left: clamp(24px, calc(100vw - 824px), 72px); }
+  .site.site--reader-left .timeline__today,
+  .site.site--reader-right .timeline__today {
+    left: clamp(24px, calc(100vw - 824px), 72px);
+    transform: none;
+  }
   /* Reader panel in narrow */
   .reader--side-left .reader__panel,
   .reader--side-right .reader__panel {
-    margin-left: 160px;
+    margin-left: clamp(112px, calc(100vw - 736px), 160px);
     margin-right: 16px;
     margin-top: 80px;
     margin-bottom: 80px;
