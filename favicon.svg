@@ -3,5 +3,5 @@
     <style>@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&amp;display=swap');</style>
   </defs>
   <rect width="32" height="32" rx="6" fill="#1a1814"/>
-  <text x="16" y="24" font-family="Playfair Display, Georgia, serif" font-size="22" font-weight="600" fill="#f7f3ec" text-anchor="middle">B</text>
+  <text x="16" y="24" font-family="Playfair Display, Georgia, serif" font-size="23" font-weight="500" font-style="italic" fill="#f7f3ec" text-anchor="middle" letter-spacing="1">ib</text>
 </svg>
