@@ -203,10 +203,67 @@ function Card({ entry, side, onOpen, tweaks, hidden }) {
   );
 }
 
+// ───────── Lightbox ─────────
+function Lightbox({ images, index, onClose, onNavigate }) {
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowRight") onNavigate(1);
+      else if (e.key === "ArrowLeft") onNavigate(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose, onNavigate]);
+
+  const multi = images.length > 1;
+
+  return (
+    <div className="lightbox" onClick={onClose} role="dialog" aria-modal="true" aria-label="Image viewer">
+      <button className="lightbox__close" onClick={onClose} aria-label="Close">
+        <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <path d="M4 4l12 12M16 4L4 16"/>
+        </svg>
+      </button>
+      <img
+        className="lightbox__img"
+        src={images[index]}
+        alt=""
+        onClick={(e) => e.stopPropagation()}
+      />
+      {multi && (
+        <>
+          <button
+            className="lightbox__nav lightbox__nav--prev"
+            onClick={(e) => { e.stopPropagation(); onNavigate(-1); }}
+            aria-label="Previous image"
+          >
+            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M12 4L6 10l6 6"/>
+            </svg>
+          </button>
+          <button
+            className="lightbox__nav lightbox__nav--next"
+            onClick={(e) => { e.stopPropagation(); onNavigate(1); }}
+            aria-label="Next image"
+          >
+            <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M8 4l6 6-6 6"/>
+            </svg>
+          </button>
+          <div className="lightbox__counter" onClick={(e) => e.stopPropagation()}>
+            {index + 1} / {images.length}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ───────── Expanded reader (Staged animation) ─────────
 function Reader({ entry, onClose, tweaks, side }) {
   const panelRef = useRef(null);
   const [visible, setVisible] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
 
   // Step 3 of staged sequence: panel enters after cards have faded and spine has started sliding
   useEffect(() => {
@@ -225,10 +282,33 @@ function Reader({ entry, onClose, tweaks, side }) {
   };
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") handleClose(); };
+    const onKey = (e) => {
+      // Lightbox owns Escape while it's open.
+      if (e.key === "Escape" && !lightbox) handleClose();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [lightbox]);
+
+  const handleBodyClick = (e) => {
+    const btn = e.target.closest(".gallery__item");
+    if (!btn) return;
+    e.preventDefault();
+    const gallery = btn.closest(".gallery");
+    if (!gallery) return;
+    const items = [...gallery.querySelectorAll(".gallery__item")];
+    const images = items.map(item => item.querySelector("img")?.src).filter(Boolean);
+    const idx = items.indexOf(btn);
+    if (idx >= 0 && images.length > 0) setLightbox({ images, index: idx });
+  };
+
+  const closeLightbox = () => setLightbox(null);
+  const navigateLightbox = (delta) => {
+    setLightbox(lb => lb ? {
+      ...lb,
+      index: (lb.index + delta + lb.images.length) % lb.images.length,
+    } : null);
+  };
 
   return (
     <div className={`reader reader--side-${side}${visible ? " reader--visible" : ""}`}>
@@ -254,9 +334,21 @@ function Reader({ entry, onClose, tweaks, side }) {
           {entry.kind === "project" && entry.hero && (
             <div className="reader__hero"><Hero hero={entry.hero} /></div>
           )}
-          <div className="reader__body" dangerouslySetInnerHTML={{ __html: entry.body }} />
+          <div
+            className="reader__body"
+            onClick={handleBodyClick}
+            dangerouslySetInnerHTML={{ __html: entry.body }}
+          />
         </div>
       </article>
+      {lightbox && (
+        <Lightbox
+          images={lightbox.images}
+          index={lightbox.index}
+          onClose={closeLightbox}
+          onNavigate={navigateLightbox}
+        />
+      )}
     </div>
   );
 }
@@ -402,6 +494,38 @@ function parseMediumFeed(xml) {
   }).filter(e => e.title && e.id);
 }
 
+// Substack renders image galleries with an empty <div class="image-gallery-embed">
+// whose images are JSON-encoded inside data-attrs and only materialize via JS on
+// substack.com. Rebuild them as a side-by-side gallery the reader can lightbox.
+function expandSubstackGalleries(html) {
+  const doc = new DOMParser().parseFromString(`<!doctype html><body>${html}`, "text/html");
+  doc.querySelectorAll(".image-gallery-embed").forEach(el => {
+    const raw = el.getAttribute("data-attrs");
+    if (!raw) return;
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch { return; }
+    const images = (parsed?.gallery?.images ?? []).filter(img => img?.src);
+    if (images.length === 0) return;
+    const gallery = doc.createElement("div");
+    gallery.className = "gallery";
+    gallery.style.setProperty("--gallery-cols", String(images.length));
+    images.forEach((img, i) => {
+      const button = doc.createElement("button");
+      button.type = "button";
+      button.className = "gallery__item";
+      button.setAttribute("aria-label", `Open image ${i + 1} of ${images.length}`);
+      const node = doc.createElement("img");
+      node.src = img.src;
+      node.alt = "";
+      node.loading = "lazy";
+      button.appendChild(node);
+      gallery.appendChild(button);
+    });
+    el.replaceWith(gallery);
+  });
+  return doc.body.innerHTML;
+}
+
 // ───────── Substack RSS feed ─────────
 function parseSubstackFeed(xml) {
   const doc = new DOMParser().parseFromString(xml, "application/xml");
@@ -412,7 +536,9 @@ function parseSubstackFeed(xml) {
     const rawDate = get("pubDate");
     const date = rawDate ? new Date(rawDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
     const rawBody = get("content:encoded") || get("description");
-    const body = rawBody.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "");
+    const body = expandSubstackGalleries(
+      rawBody.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "")
+    );
     const enclosure = item.querySelector("enclosure");
     const mediaEl = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("media:thumbnail")[0];
     const rawCover = enclosure?.getAttribute("url") || mediaEl?.getAttribute("url") || null;
