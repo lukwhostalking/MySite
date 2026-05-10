@@ -610,7 +610,12 @@ function App() {
   );
 
   useEffect(() => {
-    fetchViaProxy("https://ishanbhalla.substack.com/feed")
+    // Substack's RSS endpoint is aggressively cached on their CDN, so edits to
+    // a post (title, body) can take a while to appear at /feed. Append an
+    // hourly bucket so we get a fresh response at most once per hour without
+    // hammering the origin on every page load.
+    const hourBucket = Math.floor(Date.now() / 3_600_000);
+    fetchViaProxy(`https://ishanbhalla.substack.com/feed?_=${hourBucket}`)
       .then(xml => {
         const posts = parseSubstackFeed(xml);
         if (posts.length > 0) {
